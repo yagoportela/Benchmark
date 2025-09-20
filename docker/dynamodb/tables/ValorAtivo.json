@@ -1,0 +1,58 @@
+{
+  "TableName": "ValorAtivo",
+  "KeySchema": [
+    { "AttributeName": "NomeSerie", "KeyType": "HASH" },
+    { "AttributeName": "NomeAtributoDataInicioVigencia", "KeyType": "RANGE" }
+  ],
+  "AttributeDefinitions": [
+    { "AttributeName": "NomeSerie", "AttributeType": "S" },
+    { "AttributeName": "NomeAtributoDataInicioVigencia", "AttributeType": "S" },
+    { "AttributeName": "NomeAtributo", "AttributeType": "S" },
+    { "AttributeName": "NomeFamilia", "AttributeType": "S" },
+    { "AttributeName": "DataInicioVigencia", "AttributeType": "S" }
+  ],
+  "LocalSecondaryIndexes": [
+    {
+      "IndexName": "BuscarFamilia",
+      "KeySchema": [
+        { "AttributeName": "NomeSerie", "KeyType": "HASH" },
+        { "AttributeName": "NomeFamilia", "KeyType": "RANGE" }
+      ],
+      "Projection": { "ProjectionType": "ALL" }
+    },
+    {
+      "IndexName": "BuscarAtributo",
+      "KeySchema": [
+        { "AttributeName": "NomeSerie", "KeyType": "HASH" },
+        { "AttributeName": "NomeAtributo", "KeyType": "RANGE" }
+      ],
+      "Projection": { "ProjectionType": "ALL" }
+    },
+    {
+      "IndexName": "BuscarDataInicioVigencia",
+      "KeySchema": [
+        { "AttributeName": "NomeSerie", "KeyType": "HASH" },
+        { "AttributeName": "DataInicioVigencia", "KeyType": "RANGE" }
+      ],
+      "Projection": { "ProjectionType": "ALL" }
+    }
+  ],
+  "GlobalSecondaryIndexes": [
+    {
+      "IndexName": "GsiBuscaFamilia",
+      "KeySchema": [
+        { "AttributeName": "NomeFamilia", "KeyType": "HASH" },
+        { "AttributeName": "DataInicioVigencia", "KeyType": "RANGE" }
+      ],
+      "Projection": { "ProjectionType": "ALL" },
+      "ProvisionedThroughput": {
+        "ReadCapacityUnits": 5,
+        "WriteCapacityUnits": 5
+      }
+    }
+  ],
+  "ProvisionedThroughput": {
+    "ReadCapacityUnits": 10,
+    "WriteCapacityUnits": 10
+  }
+}

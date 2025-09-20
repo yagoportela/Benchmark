@@ -1,0 +1,49 @@
+services:
+  dynamodb-valorativo:
+    container_name: dynamodb-valorativo
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    image: "amazon/dynamodb-local:latest"
+    user: root
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./volume_docker_valorativo:/home/dynamodblocal/data:Z
+    working_dir: /home/dynamodblocal
+    healthcheck:
+      test: ["CMD-SHELL", '[ "$(curl -s -o /dev/null -I -w ''%{http_code}'' http://localhost:8000)" == "400" ]']
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  init-db:
+    image: amazon/aws-cli
+    container_name: init-db
+    depends_on:
+      dynamodb-valorativo:
+        condition: service_healthy 
+    networks:
+      - default
+    volumes:
+      - ./dynamodb:/tmp:Z
+    environment:
+      - AWS_DEFAULT_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=dummy
+      - AWS_SECRET_ACCESS_KEY=dummy
+    working_dir: /
+    entrypoint: ["sh", "/tmp/init-db.sh"]
+
+  dynamodb-admin:
+    container_name: dynamodb-admin
+    image: aaronshaf/dynamodb-admin
+    ports:
+      - "8001:8001"
+    environment:
+      DYNAMO_ENDPOINT: "http://dynamodb-valorativo:8000"
+      AWS_REGION: "us-east-1"
+    depends_on:
+      dynamodb-valorativo:
+        condition: service_healthy 
+
+volumes:
+  volume_docker_valorativo:
+    external: true
