@@ -84,10 +84,10 @@ public class BenchmarkDynamoDbService(IDynamoDBRepository dynamoDBRepository)
         ImprimirResultado("Querie por familia e data", resultValoresDynamoDb, elapsedTime);
     }
 
-    public async Task GetFiltroFamiliaData(List<ValorDynamoDB> valoresDynamoDb)
+    public async Task GetFiltroFamiliaData(List<ValorDynamoDB> valoresDynamoDb, int limiteFamila)
     {
         List<ValorDynamoDB> resultValoresDynamoDb = [];
-        List<string> listaFamilia = [.. valoresDynamoDb.Select(x => x.NomeFamilia).Distinct()];
+        List<string> listaFamilia = [.. valoresDynamoDb.Select(x => x.NomeFamilia).Distinct().Take(limiteFamila)];
         List<DateOnly> listaDataInicioVigencia = [.. valoresDynamoDb.Select(x => x.DataInicioVigencia).Distinct()];
 
         Stopwatch timer = new();
@@ -104,26 +104,7 @@ public class BenchmarkDynamoDbService(IDynamoDBRepository dynamoDBRepository)
         string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
             ts.Hours, ts.Minutes, ts.Seconds,
             ts.Milliseconds / 10);
-        ImprimirResultado("Scan por familia e data", resultValoresDynamoDb, elapsedTime);
-    }
-
-    public async Task GetFamilia(List<ValorDynamoDB> valoresDynamoDb)
-    {
-        List<ValorDynamoDB> resultValoresDynamoDb = [];
-        List<string> listaFamilia = [.. valoresDynamoDb.Select(x => x.NomeFamilia).Distinct()];
-
-        Stopwatch timer = new();
-        timer.Start();
-        foreach (string familia in listaFamilia)
-        {
-            resultValoresDynamoDb.AddRange(await dynamoDBRepository.GetValorFamiliaDataAsync(familia));
-        }
-        timer.Stop();
-        TimeSpan ts = timer.Elapsed;
-        string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-            ts.Hours, ts.Minutes, ts.Seconds,
-            ts.Milliseconds / 10);
-        ImprimirResultado("Querir por familia", resultValoresDynamoDb, elapsedTime);
+        ImprimirResultado("Scan por familia e data(Limitado)", resultValoresDynamoDb, elapsedTime);
     }
 
     public async Task GetSerieFamiliaData(List<ValorDynamoDB> valoresDynamoDb)
@@ -153,12 +134,12 @@ public class BenchmarkDynamoDbService(IDynamoDBRepository dynamoDBRepository)
         ImprimirResultado("Querie por serie, familia e data", resultValoresDynamoDb, elapsedTime);
     }
 
-    public async Task GetFiltroSerieFamiliaData(List<ValorDynamoDB> valoresDynamoDb)
+    public async Task GetFiltroSerieFamiliaData(List<ValorDynamoDB> valoresDynamoDb, int limiteFamilia, int limiteData)
     {
         List<ValorDynamoDB> resultValoresDynamoDb = [];
-        List<string> listaFamilia = [.. valoresDynamoDb.Select(x => x.NomeFamilia).Distinct()];
+        List<string> listaFamilia = [.. valoresDynamoDb.Select(x => x.NomeFamilia).Distinct().Take(limiteFamilia)];
         List<string> listaSerie = [.. valoresDynamoDb.Select(x => x.NomeSerie).Distinct()];
-        List<DateOnly> listaDataInicioVigencia = [.. valoresDynamoDb.Select(x => x.DataInicioVigencia).Distinct()];
+        List<DateOnly> listaDataInicioVigencia = [.. valoresDynamoDb.Select(x => x.DataInicioVigencia).Distinct().Take(limiteData)];
 
         Stopwatch timer = new();
         timer.Start();
@@ -177,53 +158,7 @@ public class BenchmarkDynamoDbService(IDynamoDBRepository dynamoDBRepository)
         string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
             ts.Hours, ts.Minutes, ts.Seconds,
             ts.Milliseconds / 10);
-        ImprimirResultado("Scan por serie, familia e data", resultValoresDynamoDb, elapsedTime);
-    }
-
-    public async Task GetSerieFamilia(List<ValorDynamoDB> valoresDynamoDb)
-    {
-        List<ValorDynamoDB> resultValoresDynamoDb = [];
-        List<string> listaFamilia = [.. valoresDynamoDb.Select(x => x.NomeFamilia).Distinct()];
-        List<string> listaSerie = [.. valoresDynamoDb.Select(x => x.NomeSerie).Distinct()];
-
-        Stopwatch timer = new();
-        timer.Start();
-        foreach (string familia in listaFamilia)
-        {
-            foreach (string serie in listaSerie)
-            {
-                resultValoresDynamoDb.AddRange(await dynamoDBRepository.GetValorSerieFamiliaAsync(serie, familia));
-            }
-        }
-        timer.Stop();
-        TimeSpan ts = timer.Elapsed;
-        string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-            ts.Hours, ts.Minutes, ts.Seconds,
-            ts.Milliseconds / 10);
-        ImprimirResultado("Querie por serie e familia", resultValoresDynamoDb, elapsedTime);
-    }
-
-    public async Task GetFiltroSerieFamilia(List<ValorDynamoDB> valoresDynamoDb)
-    {
-        List<ValorDynamoDB> resultValoresDynamoDb = [];
-        List<string> listaFamilia = [.. valoresDynamoDb.Select(x => x.NomeFamilia).Distinct()];
-        List<string> listaSerie = [.. valoresDynamoDb.Select(x => x.NomeSerie).Distinct()];
-
-        Stopwatch timer = new();
-        timer.Start();
-        foreach (string familia in listaFamilia)
-        {
-            foreach (string serie in listaSerie)
-            {
-                resultValoresDynamoDb.AddRange(await dynamoDBRepository.GetValoresComFiltrosAsync(nomeSerie: serie, nomeFamilia: familia));
-            }
-        }
-        timer.Stop();
-        TimeSpan ts = timer.Elapsed;
-        string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-            ts.Hours, ts.Minutes, ts.Seconds,
-            ts.Milliseconds / 10);
-        ImprimirResultado("Scan por serie e familia", resultValoresDynamoDb, elapsedTime);
+        ImprimirResultado("Scan por serie, familia e data(Limitado)", resultValoresDynamoDb, elapsedTime);
     }
 
     public async Task GetSerieAtributoData(List<ValorDynamoDB> valoresDynamoDb)
@@ -242,48 +177,6 @@ public class BenchmarkDynamoDbService(IDynamoDBRepository dynamoDBRepository)
             ts.Hours, ts.Minutes, ts.Seconds,
             ts.Milliseconds / 10);
         ImprimirResultado("Querie por serie, atributo e data", resultValoresDynamoDb, elapsedTime);
-    }
-
-    public async Task GetItemSerieAtributo(List<ValorDynamoDB> valoresDynamoDb)
-    {
-        List<ValorDynamoDB> resultValoresDynamoDb = [];
-
-        Stopwatch timer = new();
-        timer.Start();
-        foreach (ValorDynamoDB valorDynamoDB in valoresDynamoDb)
-        {
-            resultValoresDynamoDb.AddRange(await dynamoDBRepository.GetItemSerieAtributoAsync(valorDynamoDB.NomeSerie, $"{valorDynamoDB.NomeAtributo}#{valorDynamoDB.DataInicioVigencia:yyyyMMdd}"));
-        }
-        timer.Stop();
-        TimeSpan ts = timer.Elapsed;
-        string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-            ts.Hours, ts.Minutes, ts.Seconds,
-            ts.Milliseconds / 10);
-        ImprimirResultado("Querie item por serie e atributo", resultValoresDynamoDb, elapsedTime);
-    }
-
-    public async Task GetSerieAtributo(List<ValorDynamoDB> valoresDynamoDb)
-    {
-        List<ValorDynamoDB> resultValoresDynamoDb = [];
-
-        Stopwatch timer = new();
-        timer.Start();
-        List<string> listaSerie = [.. valoresDynamoDb.Select(x => x.NomeSerie).Distinct()];
-        List<string> listaAtributos = [.. valoresDynamoDb.Select(x => x.NomeAtributo).Distinct()];
-
-        foreach (string serie in listaSerie)
-        {
-            foreach (string atributo in listaAtributos)
-            {
-                resultValoresDynamoDb.AddRange(await dynamoDBRepository.GetValorSerieAtributoAsync(serie, atributo));
-            }
-        }
-        timer.Stop();
-        TimeSpan ts = timer.Elapsed;
-        string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-            ts.Hours, ts.Minutes, ts.Seconds,
-            ts.Milliseconds / 10);
-        ImprimirResultado("Querie por serie e atributo", resultValoresDynamoDb, elapsedTime);
     }
 
     public async Task GetSerieData(List<ValorDynamoDB> valoresDynamoDb)
@@ -309,48 +202,6 @@ public class BenchmarkDynamoDbService(IDynamoDBRepository dynamoDBRepository)
         ImprimirResultado("Querie por serie e data", resultValoresDynamoDb, elapsedTime);
     }
 
-    public async Task GetSerie(List<ValorDynamoDB> valoresDynamoDb)
-    {
-        List<ValorDynamoDB> resultValoresDynamoDb = [];
-        List<string> listaSerie = [.. valoresDynamoDb.Select(x => x.NomeSerie).Distinct()];
-
-        Stopwatch timer = new();
-        timer.Start();
-        foreach (string serie in listaSerie)
-        {
-            resultValoresDynamoDb.AddRange(await dynamoDBRepository.GetValorSerieDataAsync(serie));
-        }
-        timer.Stop();
-        TimeSpan ts = timer.Elapsed;
-        string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-            ts.Hours, ts.Minutes, ts.Seconds,
-            ts.Milliseconds / 10);
-        ImprimirResultado("Query Por serie", resultValoresDynamoDb, elapsedTime);
-    }
-
-    public async Task GetFiltoFamilia(List<ValorDynamoDB> valoresDynamoDb)
-    {
-        List<ValorDynamoDB> resultValoresDynamoDb = [];
-        List<string> listaFamilia = [.. valoresDynamoDb.Select(x => x.NomeFamilia).Distinct()];
-        List<DateOnly> listaDataInicioVigencia = [.. valoresDynamoDb.Select(x => x.DataInicioVigencia).Distinct()];
-
-        Stopwatch timer = new();
-        timer.Start();
-        foreach (DateOnly dataInicioVigencia in listaDataInicioVigencia)
-        {
-            foreach (string familia in listaFamilia)
-            {
-                resultValoresDynamoDb.AddRange(await dynamoDBRepository.GetValoresComFiltrosAsync(nomeFamilia: familia, dataInicioVigencia: dataInicioVigencia));
-            }
-        }
-        timer.Stop();
-        TimeSpan ts = timer.Elapsed;
-        string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-            ts.Hours, ts.Minutes, ts.Seconds,
-            ts.Milliseconds / 10);
-        ImprimirResultado("Scan por familia e data", resultValoresDynamoDb, elapsedTime);
-    }
-
     public async Task GetFiltoSerie(List<ValorDynamoDB> valoresDynamoDb)
     {
         List<ValorDynamoDB> resultValoresDynamoDb = [];
@@ -374,15 +225,14 @@ public class BenchmarkDynamoDbService(IDynamoDBRepository dynamoDBRepository)
         ImprimirResultado("Scan por serie e data", resultValoresDynamoDb, elapsedTime);
     }
 
-    public async Task GetFiltoSerieAtributoData(List<ValorDynamoDB> valoresDynamoDb)
+    public async Task GetFiltoSerieAtributoData(List<ValorDynamoDB> valoresDynamoDb, int limiteValores)
     {
         List<ValorDynamoDB> resultValoresDynamoDb = [];
-        List<string> listaSerie = [.. valoresDynamoDb.Select(x => x.NomeSerie).Distinct()];
-        List<DateOnly> listaDataInicioVigencia = [.. valoresDynamoDb.Select(x => x.DataInicioVigencia).Distinct()];
+        List<ValorDynamoDB> filtroValores = [.. valoresDynamoDb.Take(limiteValores)];
 
         Stopwatch timer = new();
         timer.Start();
-        foreach (ValorDynamoDB valorDynamoDb in valoresDynamoDb)
+        foreach (ValorDynamoDB valorDynamoDb in filtroValores)
         {
             resultValoresDynamoDb.AddRange(await dynamoDBRepository.GetValoresComFiltrosAsync(nomeSerie: valorDynamoDb.NomeSerie, nomeAtributo: valorDynamoDb.NomeAtributo, dataInicioVigencia: valorDynamoDb.DataInicioVigencia));
         }
@@ -391,40 +241,17 @@ public class BenchmarkDynamoDbService(IDynamoDBRepository dynamoDBRepository)
         string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
             ts.Hours, ts.Minutes, ts.Seconds,
             ts.Milliseconds / 10);
-        ImprimirResultado("Scan por serie, atributo e data apenas PK", resultValoresDynamoDb, elapsedTime);
+        ImprimirResultado("Scan por serie, atributo e data apenas PK (Limitado)", resultValoresDynamoDb, elapsedTime);
     }
 
-    public async Task GetFiltoSerieAtributo(List<ValorDynamoDB> valoresDynamoDb)
+    public async Task GetFiltroItemFamiliaAtributoData(List<ValorDynamoDB> valoresDynamoDb, int limiteValores)
     {
         List<ValorDynamoDB> resultValoresDynamoDb = [];
-        List<string> listaSerie = [.. valoresDynamoDb.Select(x => x.NomeSerie).Distinct()];
-        List<string> listaAtributos = [.. valoresDynamoDb.Select(x => x.NomeAtributo).Distinct()];
+        List<ValorDynamoDB> filtroValoresDynamoDb = [.. valoresDynamoDb.Take(limiteValores)];
 
         Stopwatch timer = new();
         timer.Start();
-
-        foreach (string serie in listaSerie)
-        {
-            foreach (string atributo in listaAtributos)
-            {
-                resultValoresDynamoDb.AddRange(await dynamoDBRepository.GetValoresComFiltrosAsync(nomeSerie: serie, nomeAtributo: atributo));
-            }
-        }
-        timer.Stop();
-        TimeSpan ts = timer.Elapsed;
-        string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-            ts.Hours, ts.Minutes, ts.Seconds,
-            ts.Milliseconds / 10);
-        ImprimirResultado("Scan por serie e atributo", resultValoresDynamoDb, elapsedTime);
-    }
-
-    public async Task GetFiltroItemFamiliaAtributoData(List<ValorDynamoDB> valoresDynamoDb)
-    {
-        List<ValorDynamoDB> resultValoresDynamoDb = [];
-
-        Stopwatch timer = new();
-        timer.Start();
-        foreach (ValorDynamoDB valorDynamoDb in valoresDynamoDb)
+        foreach (ValorDynamoDB valorDynamoDb in filtroValoresDynamoDb)
         {
             resultValoresDynamoDb.AddRange(await dynamoDBRepository.GetValoresComFiltrosAsync(nomeFamilia: valorDynamoDb.NomeFamilia, nomeAtributoDataInicioVigencia: $"{valorDynamoDb.NomeAtributo}#{valorDynamoDb.DataInicioVigencia:yyyyMMdd}"));
         }
@@ -433,63 +260,61 @@ public class BenchmarkDynamoDbService(IDynamoDBRepository dynamoDBRepository)
         string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
             ts.Hours, ts.Minutes, ts.Seconds,
             ts.Milliseconds / 10);
-        ImprimirResultado("Scan item por familia, atributo e data", resultValoresDynamoDb, elapsedTime);
+        ImprimirResultado("Scan item por familia, atributo e data(Limitado)", resultValoresDynamoDb, elapsedTime);
     }
 
-    public async Task GetFiltroFamiliaAtributoData(List<ValorDynamoDB> valoresDynamoDb)
+    public async Task GetFiltroFamiliaAtributoData(List<ValorDynamoDB> valoresDynamoDb, int limiteFamilia, int limiteData)
     {
         List<ValorDynamoDB> resultValoresDynamoDb = [];
+        List<string> filtoFamilia = [.. valoresDynamoDb.Select(x => x.NomeFamilia).Take(limiteFamilia)];
+        List<string> filtoAtributo = [.. valoresDynamoDb.Select(x => x.NomeAtributo).Take(limiteFamilia)];
+        List<DateOnly> filtoData = [.. valoresDynamoDb.Select(x => x.DataInicioVigencia).Take(limiteData)];
 
         Stopwatch timer = new();
         timer.Start();
-        foreach (ValorDynamoDB valorDynamoDb in valoresDynamoDb)
+        foreach (string familia in filtoFamilia)
         {
-            resultValoresDynamoDb.AddRange(await dynamoDBRepository.GetValoresComFiltrosAsync(nomeFamilia: valorDynamoDb.NomeFamilia, nomeAtributo: valorDynamoDb.NomeAtributo, dataInicioVigencia: valorDynamoDb.DataInicioVigencia));
+            foreach (DateOnly data in filtoData)
+            {
+                foreach (string atributo in filtoAtributo)
+                {
+                    resultValoresDynamoDb.AddRange(await dynamoDBRepository.GetValoresComFiltrosAsync(nomeFamilia: familia, nomeAtributo: atributo, dataInicioVigencia: data));
+                }
+            }
         }
         timer.Stop();
         TimeSpan ts = timer.Elapsed;
         string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
             ts.Hours, ts.Minutes, ts.Seconds,
             ts.Milliseconds / 10);
-        ImprimirResultado("Scan por familia, atributo e data", resultValoresDynamoDb, elapsedTime);
+        ImprimirResultado("Scan por familia, atributo e data(Limitado)", resultValoresDynamoDb, elapsedTime);
     }
 
-    public async Task GetFiltroFamiliaAtributo(List<ValorDynamoDB> valoresDynamoDb)
-    {
-        List<ValorDynamoDB> resultValoresDynamoDb = [];
-
-        Stopwatch timer = new();
-        timer.Start();
-        foreach (ValorDynamoDB valorDynamoDb in valoresDynamoDb)
-        {
-            resultValoresDynamoDb.AddRange(await dynamoDBRepository.GetValoresComFiltrosAsync(nomeFamilia: valorDynamoDb.NomeFamilia, nomeAtributo: valorDynamoDb.NomeAtributo));
-        }
-        timer.Stop();
-        TimeSpan ts = timer.Elapsed;
-        string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
-            ts.Hours, ts.Minutes, ts.Seconds,
-            ts.Milliseconds / 10);
-        ImprimirResultado("Scan por familia e atributo", resultValoresDynamoDb, elapsedTime);
-    }
-
-    public async Task GetFiltoSerieData(List<ValorDynamoDB> valoresDynamoDb)
+    public async Task GetFiltoSerieData(List<ValorDynamoDB> valoresDynamoDb, int limiteData)
     {
         List<ValorDynamoDB> resultValoresDynamoDb = [];
         List<string> listaSerie = [.. valoresDynamoDb.Select(x => x.NomeSerie).Distinct()];
-        List<DateOnly> listaDataInicioVigencia = [.. valoresDynamoDb.Select(x => x.DataInicioVigencia).Distinct()];
+        List<string> listaAtributo = [.. valoresDynamoDb.Select(x => x.NomeAtributo).Distinct()];
+        List<DateOnly> listaDataInicioVigencia = [.. valoresDynamoDb.Select(x => x.DataInicioVigencia).Distinct().Take(limiteData)];
 
         Stopwatch timer = new();
         timer.Start();
-        foreach (ValorDynamoDB valorDynamoDb in valoresDynamoDb)
+        foreach (string serie in listaSerie)
         {
-            resultValoresDynamoDb.AddRange(await dynamoDBRepository.GetValoresComFiltrosAsync(nomeSerie: valorDynamoDb.NomeSerie, nomeAtributoDataInicioVigencia: $"{valorDynamoDb.NomeAtributo}#{valorDynamoDb.DataInicioVigencia:yyyyMMdd}"));
+            foreach (string atributo in listaAtributo)
+            {
+                foreach (DateOnly dataInicio in listaDataInicioVigencia)
+                {
+                    resultValoresDynamoDb.AddRange(await dynamoDBRepository.GetValoresComFiltrosAsync(nomeSerie: serie, nomeAtributoDataInicioVigencia: $"{atributo}#{dataInicio:yyyyMMdd}"));
+                }
+            }
         }
         timer.Stop();
         TimeSpan ts = timer.Elapsed;
         string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
             ts.Hours, ts.Minutes, ts.Seconds,
             ts.Milliseconds / 10);
-        ImprimirResultado("Scan por serie e data PK e SK", resultValoresDynamoDb, elapsedTime);
+        ImprimirResultado("Scan por serie e data PK e SK(Limitado)", resultValoresDynamoDb, elapsedTime);
     }
 
     public static List<ValorDynamoDB> CriarDados(int qtdFamilia, int qtdSerie, int qtdAtributo, int qtdDias)

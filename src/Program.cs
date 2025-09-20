@@ -4,7 +4,8 @@ using BenchmarkFinanceiro.Tests;
 Console.WriteLine("Iniciando Benchmark...");
 
 #if !DEBUG
-    var resultado = BenchmarkRunner.Run<BenchmarkDynamoDbTest>();
+    BenchmarkRunner.Run<BenchmarkDynamoDbTest>();
+    BenchmarkRunner.Run<BenchmarkPostgresTest>();
 #else
 await CallPostgres();
 await CallDynamoDb();
@@ -38,36 +39,27 @@ static async Task CallDynamoDb()
 
     //Item
     await benchmarkDynamoDbTest.BenchmarkItemDataDynamoDb();
-    await benchmarkDynamoDbTest.BenchmarkItemSerieAtributo();
 
     //Serie Atributo
     await benchmarkDynamoDbTest.BenchmarkSerieAtributoDataDynamoDb();
-    await benchmarkDynamoDbTest.BenchmarkFiltoSerieAtributoData();
-    await benchmarkDynamoDbTest.BenchmarkSerieAtributo();
-    await benchmarkDynamoDbTest.BenchmarkFiltoSerieAtributo();
+    await benchmarkDynamoDbTest.BenchmarkFiltoSerieAtributoData_limitado();
 
     //Familia
     await benchmarkDynamoDbTest.BenchmarkFamiliaDataDynamoDb();
-    await benchmarkDynamoDbTest.BenchmarkFiltroFamiliaDataDynamoDb();
-    await benchmarkDynamoDbTest.BenchmarkFamiliaDynamoDb();
-    await benchmarkDynamoDbTest.BenchmarkFiltoFamiliaDynamoDb();
+    await benchmarkDynamoDbTest.BenchmarkFiltroFamiliaDataDynamoDb_limitado();
 
     //Familia Atributo
     await benchmarkDynamoDbTest.BenchmarkFiltroItemFamiliaAtributoData();
     await benchmarkDynamoDbTest.BenchmarkFiltroFamiliaAtributoData();
-    await benchmarkDynamoDbTest.BenchmarkFiltroFamiliaAtributo();
 
     //Serie
     await benchmarkDynamoDbTest.BenchmarkSerieDataDynamoDb();
-    await benchmarkDynamoDbTest.BenchmarkFiltoSerieData();
-    await benchmarkDynamoDbTest.BenchmarkSerieDynamoDb();
+    await benchmarkDynamoDbTest.BenchmarkFiltoSerieData_limitado();
     await benchmarkDynamoDbTest.BenchmarkFiltoSerieDynamoDb();
 
     //Serie Familia
     await benchmarkDynamoDbTest.BenchmarkSerieFamiliaDataDynamoDb();
-    await benchmarkDynamoDbTest.BenchmarkFiltroSerieFamiliaDataDynamoDb();
-    await benchmarkDynamoDbTest.BenchmarkSerieFamiliaDynamoDb();
-    await benchmarkDynamoDbTest.BenchmarkFiltroSerieFamiliaDynamoDb();
+    await benchmarkDynamoDbTest.BenchmarkFiltroSerieFamiliaDataDynamoDb_limitado();
 
     // await benchmarkDynamoDbTest.BenchmarkDeleteAllDynamoDb();
 }

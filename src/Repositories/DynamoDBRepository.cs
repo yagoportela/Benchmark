@@ -153,27 +153,6 @@ public class DynamoDBRepository : IDynamoDBRepository
         return listaValorDynamoDb;
     }
 
-    public async Task<List<ValorDynamoDB>> GetValorFamiliaDataAsync(string nomeFamilia)
-    {
-        QueryRequest queryRequest = new()
-        {
-            TableName = _tableName,
-            IndexName = "GsiBuscaFamilia",
-            KeyConditionExpression = "#nomeFamilia = :nomeFamilia",
-            ExpressionAttributeNames = new Dictionary<String, String> {
-                {"#nomeFamilia", "NomeFamilia"}
-            },
-            ExpressionAttributeValues = new Dictionary<string, AttributeValue> {
-                {":nomeFamilia", new AttributeValue { S =  nomeFamilia }}
-            },
-            ScanIndexForward = true
-        };
-
-        QueryResponse response = await _dynamoDBClient.QueryAsync(queryRequest);
-        List<ValorDynamoDB> listaValorDynamoDb = [.. response.Items.Select(x => ConvertFromDynamoDBItem(x))];
-        return listaValorDynamoDb;
-    }
-
     public async Task<List<ValorDynamoDB>> GetValorSerieFamiliaAsync(string nomeSerie, string nomeFamilia, DateOnly dataInicioVigencia)
     {
         QueryRequest queryRequest = new()
@@ -191,29 +170,6 @@ public class DynamoDBRepository : IDynamoDBRepository
                 {":nomeFamilia", new AttributeValue { S =  nomeFamilia }},
                 {":nomeSerie", new AttributeValue { S =  nomeSerie }},
                 {":dataInicioVigencia", new AttributeValue { S =  dataInicioVigencia.ToString("yyyyMMdd") }}
-            },
-            ScanIndexForward = true
-        };
-
-        QueryResponse response = await _dynamoDBClient.QueryAsync(queryRequest);
-        List<ValorDynamoDB> listaValorDynamoDb = [.. response.Items.Select(x => ConvertFromDynamoDBItem(x))];
-        return listaValorDynamoDb;
-    }
-
-    public async Task<List<ValorDynamoDB>> GetValorSerieFamiliaAsync(string nomeSerie, string nomeFamilia)
-    {
-        QueryRequest queryRequest = new()
-        {
-            TableName = _tableName,
-            IndexName = "BuscarFamilia",
-            KeyConditionExpression = "#NomeFamilia = :nomeFamilia and #NomeSerie = :nomeSerie",
-            ExpressionAttributeNames = new Dictionary<string, string> {
-                {"#NomeFamilia", "NomeFamilia"},
-                {"#NomeSerie", "NomeSerie"}
-            },
-            ExpressionAttributeValues = new Dictionary<string, AttributeValue> {
-                {":nomeFamilia", new AttributeValue { S =  nomeFamilia }},
-                {":nomeSerie", new AttributeValue { S =  nomeSerie }}
             },
             ScanIndexForward = true
         };
@@ -249,51 +205,6 @@ public class DynamoDBRepository : IDynamoDBRepository
         return listaValorDynamoDb;
     }
 
-    public async Task<List<ValorDynamoDB>> GetValorSerieAtributoAsync(string nomeSerie, string nomeAtributo)
-    {
-        QueryRequest queryRequest = new()
-        {
-            TableName = _tableName,
-            IndexName = "BuscarAtributo",
-            KeyConditionExpression = "#nomeSerie = :nomeSerie and #nomeAtributo = :nomeAtributo ",
-            ExpressionAttributeNames = new Dictionary<string, string> {
-                {"#nomeAtributo", "NomeAtributo"},
-                {"#nomeSerie", "NomeSerie"}
-            },
-            ExpressionAttributeValues = new Dictionary<string, AttributeValue> {
-                {":nomeAtributo", new AttributeValue { S = nomeAtributo }},
-                {":nomeSerie", new AttributeValue { S =  nomeSerie }}
-            },
-            ScanIndexForward = true
-        };
-
-        QueryResponse response = await _dynamoDBClient.QueryAsync(queryRequest);
-        List<ValorDynamoDB> listaValorDynamoDb = [.. response.Items.Select(x => ConvertFromDynamoDBItem(x))];
-        return listaValorDynamoDb;
-    }
-
-    public async Task<List<ValorDynamoDB>> GetItemSerieAtributoAsync(string nomeSerie, string nomeAtributoDataInicioVigencia)
-    {
-        QueryRequest queryRequest = new()
-        {
-            TableName = _tableName,
-            KeyConditionExpression = "#nomeSerie = :nomeSerie and #nomeAtributoDataInicioVigencia = :nomeAtributoDataInicioVigencia",
-            ExpressionAttributeNames = new Dictionary<string, string> {
-                {"#nomeAtributoDataInicioVigencia", "NomeAtributoDataInicioVigencia"},
-                {"#nomeSerie", "NomeSerie"}
-            },
-            ExpressionAttributeValues = new Dictionary<string, AttributeValue> {
-                {":nomeAtributoDataInicioVigencia", new AttributeValue { S =  nomeAtributoDataInicioVigencia }},
-                {":nomeSerie", new AttributeValue { S =  nomeSerie }}
-            },
-            ScanIndexForward = true
-        };
-
-        QueryResponse response = await _dynamoDBClient.QueryAsync(queryRequest);
-        List<ValorDynamoDB> listaValorDynamoDb = [.. response.Items.Select(x => ConvertFromDynamoDBItem(x))];
-        return listaValorDynamoDb;
-    }
-
     public async Task<List<ValorDynamoDB>> GetValorSerieDataAsync(string nomeSerie, DateOnly dataInicioVigencia)
     {
         QueryRequest queryRequest = new()
@@ -307,27 +218,6 @@ public class DynamoDBRepository : IDynamoDBRepository
             },
             ExpressionAttributeValues = new Dictionary<string, AttributeValue> {
                 {":dataInicioVigencia", new AttributeValue { S =  dataInicioVigencia.ToString("yyyyMMdd") }},
-                {":nomeSerie", new AttributeValue { S =  nomeSerie }}
-            },
-            ScanIndexForward = true
-        };
-
-        QueryResponse response = await _dynamoDBClient.QueryAsync(queryRequest);
-        List<ValorDynamoDB> listaValorDynamoDb = [.. response.Items.Select(x => ConvertFromDynamoDBItem(x))];
-        return listaValorDynamoDb;
-    }
-
-    public async Task<List<ValorDynamoDB>> GetValorSerieDataAsync(string nomeSerie)
-    {
-        QueryRequest queryRequest = new()
-        {
-            TableName = _tableName,
-            IndexName = "BuscarDataInicioVigencia",
-            KeyConditionExpression = "#nomeSerie = :nomeSerie",
-            ExpressionAttributeNames = new Dictionary<string, string> {
-                {"#nomeSerie", "NomeSerie"}
-            },
-            ExpressionAttributeValues = new Dictionary<string, AttributeValue> {
                 {":nomeSerie", new AttributeValue { S =  nomeSerie }}
             },
             ScanIndexForward = true
