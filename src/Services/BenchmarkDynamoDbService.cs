@@ -267,7 +267,7 @@ public class BenchmarkDynamoDbService(IDynamoDBRepository dynamoDBRepository)
     {
         List<ValorDynamoDB> resultValoresDynamoDb = [];
         List<string> filtoFamilia = [.. valoresDynamoDb.Select(x => x.NomeFamilia).Take(limiteFamilia)];
-        List<string> filtoAtributo = [.. valoresDynamoDb.Select(x => x.NomeAtributo).Take(limiteFamilia)];
+        List<string> filtoAtributo = [.. valoresDynamoDb.Select(x => x.NomeAtributo)];
         List<DateOnly> filtoData = [.. valoresDynamoDb.Select(x => x.DataInicioVigencia).Take(limiteData)];
 
         Stopwatch timer = new();

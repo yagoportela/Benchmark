@@ -49,8 +49,8 @@ static async Task CallDynamoDb()
     await benchmarkDynamoDbTest.BenchmarkFiltroFamiliaDataDynamoDb_limitado();
 
     //Familia Atributo
-    await benchmarkDynamoDbTest.BenchmarkFiltroItemFamiliaAtributoData();
-    await benchmarkDynamoDbTest.BenchmarkFiltroFamiliaAtributoData();
+    await benchmarkDynamoDbTest.BenchmarkFiltroItemFamiliaAtributoData_limitado();
+    await benchmarkDynamoDbTest.BenchmarkFiltroFamiliaAtributoData_limitado();
 
     //Serie
     await benchmarkDynamoDbTest.BenchmarkSerieDataDynamoDb();
